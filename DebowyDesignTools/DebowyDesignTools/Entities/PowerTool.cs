@@ -3,7 +3,10 @@
 public class PowerTool : Tool
 {
     public string Battery { get; set; }
-    
+
     public override string ToString()
-        => base.ToString() + $" ,Battery: {Battery}";
+    {
+        var batteryInfo = String.IsNullOrEmpty(Battery) ? "" : $" ,Battery: {Battery}";
+        return base.ToString() + batteryInfo;
+    }
 }
