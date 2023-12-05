@@ -6,7 +6,7 @@ public class PowerTool : Tool
 
     public override string ToString()
     {
-        var batteryInfo = String.IsNullOrEmpty(Battery) ? "" : $" ,Battery: {Battery}";
+        var batteryInfo = String.IsNullOrEmpty(Battery) ? "" : $" --- Battery: {Battery}";
         return base.ToString() + batteryInfo;
     }
 }

@@ -1,25 +1,43 @@
 ﻿using DebowyDesignTools.Data;
 using DebowyDesignTools.Entities;
 using DebowyDesignTools.Repositories;
+using DebowyDesignTools.Repositories.Extensions;
 
 var toolRepo = new SqlRepository<Tool>(new DebowyDesignToolsDbContext());
+toolRepo.ItemAdded += ToolRepositoryOnItemAdded;
+toolRepo.ItemRemoved += ToolRepositoryOnItemRemoved;
+
+static void ToolRepositoryOnItemAdded(object? sender, Tool tool)
+{
+    Console.WriteLine($"{CurrentDateTime()} --- Tool added => {tool.Name}");
+}
+
+static void ToolRepositoryOnItemRemoved(object? sender, Tool tool)
+{
+    Console.WriteLine($"{CurrentDateTime()} --- Tool removed => {tool.Name}");
+}
 
 AddTools(toolRepo);
-AddHandTools(toolRepo);
+RemoveTools(toolRepo);
 PrintToConsole(toolRepo);
-
 
 static void AddTools(IRepository<Tool> toolRepo)
 {
-    toolRepo.Add(new PowerTool {Brand = "Makita", Name = "Screwdriver", Model = "DHP450", Battery = "18v"});
-    toolRepo.Add(new PowerTool {Brand = "Scheppach", Name = "Saw", Model = "DCP900"});
-    toolRepo.Add(new PowerTool {Brand = "Makita", Name = "MillingMachine", Model = "DSC100", Battery = "18v"});
+    var tools = new[]
+    {
+        new PowerTool {Brand = "Makita", Name = "Screwdriver", Model = "DHP450", Battery = "18v"},
+        new Tool {Brand = "Scheppach", Name = "Saw", Model = "DCP900"},
+        new PowerTool {Brand = "Makita", Name = "MillingMachine", Model = "DSC100", Battery = "18v"},
+        new HandTool {Brand = "Fiskars", Name = "Hammer"}
+    };
+    
+    toolRepo.AddBatch(tools);
 }
 
-void AddHandTools(IWriteRepository<HandTool> handToolRepo)
+static void RemoveTools(IRepository<Tool> toolRepo)
 {
-    handToolRepo.Add(new HandTool {Brand = "Fiskars", Name = "Hammer"});
-    handToolRepo.Save();
+    var toolId = toolRepo.GetById(2);
+    toolRepo.Remove(toolId);
 }
 
 void PrintToConsole(IReadRepository<IEntity> repository)
@@ -30,4 +48,9 @@ void PrintToConsole(IReadRepository<IEntity> repository)
     {
         Console.WriteLine(item);
     }
+}
+
+static DateTime CurrentDateTime()
+{
+    return DateTime.Now;
 }
