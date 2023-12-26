@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using DebowyDesignTools.DataProviders;
+using DebowyDesignTools.DataProviders.Extensions;
 using DebowyDesignTools.Entities;
 using DebowyDesignTools.Repositories;
 
@@ -10,17 +11,20 @@ public class UserCommunication : IUserCommunication
     private readonly IRepository<Tool> _toolsRepository;
     private readonly IToolsProvider _toolsProvider;
     private readonly IFileRepositoryFactory _fileRepositoryFactory;
+    private readonly IFileHelper _fileHelper;
 
     public UserCommunication
     (
         IRepository<Tool> toolsRepository,
         IToolsProvider toolsProvider,
-        IFileRepositoryFactory fileRepositoryFactory
+        IFileRepositoryFactory fileRepositoryFactory,
+        IFileHelper fileHelper
     )
     {
         _toolsRepository = toolsRepository;
         _toolsProvider = toolsProvider;
         _fileRepositoryFactory = fileRepositoryFactory;
+        _fileHelper = fileHelper;
     }
 
     public void CommunicationWithUser()
@@ -59,6 +63,20 @@ public class UserCommunication : IUserCommunication
                     var fileRepo = new FileRepository<Tool>(day);
                     PrintToConsole(fileRepo);
                     break;
+                case "4":
+                    Console.Clear();
+                    _fileHelper.LoadLastFile();
+                    _toolsProvider.OrderByName();
+                    PrintToConsole(_toolsRepository);
+                    break;
+                case "5":
+                    Console.Clear();
+                    _fileHelper.LoadLastFile();
+                    Console.WriteLine("Enter the prefix: ");
+                    var toolInput = Console.ReadLine();
+                    if (toolInput != null) 
+                        _toolsProvider.WhereStartsWith(toolInput);
+                    break;
                 case "q":
                     exitProgram = true;
                     break;
@@ -83,6 +101,8 @@ public class UserCommunication : IUserCommunication
             Console.WriteLine("1. Add equipment to the warehouse");
             Console.WriteLine("2. Remove equipment from storage");
             Console.WriteLine("3. View the stock level for the day");
+            Console.WriteLine("4. Order by name (last day)");
+            Console.WriteLine("5. Tool where prefix (last day)");
             Console.WriteLine();
         }
 

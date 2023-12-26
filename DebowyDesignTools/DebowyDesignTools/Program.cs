@@ -1,5 +1,6 @@
 ﻿using DebowyDesignTools;
 using DebowyDesignTools.DataProviders;
+using DebowyDesignTools.DataProviders.Extensions;
 using DebowyDesignTools.Entities;
 using DebowyDesignTools.Repositories;
 using DebowyDesignTools.Services;
@@ -10,9 +11,15 @@ var todayPath = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 var services = new ServiceCollection();
 
 services.AddSingleton<IApp, App>();
-services.AddSingleton<IRepository<Tool>>(sp => new FileRepository<Tool>(todayPath));
+//services.AddSingleton<IRepository<Tool>>(sp => new FileRepository<Tool>(todayPath));
+services.AddSingleton<IRepository<Tool>>(sp => {
+    var repo = new FileRepository<Tool>(todayPath);
+    repo.Load(); 
+    return repo;
+});
 services.AddSingleton<IToolsProvider, ToolsProvider>();
 services.AddSingleton<IFileRepositoryFactory, FileRepositoryFactory>();
+services.AddSingleton<IFileHelper, FileHelper>();
 services.AddSingleton<IUserCommunication, UserCommunication>();
 
 var serviceProvider = services.BuildServiceProvider();
