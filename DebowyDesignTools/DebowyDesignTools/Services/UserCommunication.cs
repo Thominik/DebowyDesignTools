@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using DebowyDesignTools.DataProviders;
+﻿using DebowyDesignTools.DataProviders;
 using DebowyDesignTools.DataProviders.Extensions;
 using DebowyDesignTools.Entities;
 using DebowyDesignTools.Repositories;
@@ -8,22 +7,16 @@ namespace DebowyDesignTools.Services;
 
 public class UserCommunication : IUserCommunication
 {
-    private readonly IRepository<Tool> _toolsRepository;
     private readonly IToolsProvider _toolsProvider;
-    private readonly IFileRepositoryFactory _fileRepositoryFactory;
     private readonly IFileHelper _fileHelper;
 
     public UserCommunication
     (
-        IRepository<Tool> toolsRepository,
         IToolsProvider toolsProvider,
-        IFileRepositoryFactory fileRepositoryFactory,
         IFileHelper fileHelper
     )
     {
-        _toolsRepository = toolsRepository;
         _toolsProvider = toolsProvider;
-        _fileRepositoryFactory = fileRepositoryFactory;
         _fileHelper = fileHelper;
     }
 
@@ -65,17 +58,17 @@ public class UserCommunication : IUserCommunication
                     break;
                 case "4":
                     Console.Clear();
-                    _fileHelper.LoadLastFile();
-                    _toolsProvider.OrderByName();
-                    PrintToConsole(_toolsRepository);
+                    var toolLoad = _fileHelper.LoadLastFile();
+                    var orderedTools = _toolsProvider.OrderByName(toolLoad);
+                    PrintToConsoleWithLinq(orderedTools);
                     break;
                 case "5":
                     Console.Clear();
-                    _fileHelper.LoadLastFile();
-                    Console.WriteLine("Enter the prefix: ");
-                    var toolInput = Console.ReadLine();
-                    if (toolInput != null) 
-                        _toolsProvider.WhereStartsWith(toolInput);
+                    toolLoad = _fileHelper.LoadLastFile();
+                    BrandInputPrint();
+                    var brand = Console.ReadLine();
+                    var toolsWithPrefix = _toolsProvider.WhereBrandStartsWith(toolLoad, brand);
+                    PrintToConsoleWithLinq(toolsWithPrefix);
                     break;
                 case "q":
                     exitProgram = true;
@@ -112,6 +105,13 @@ public class UserCommunication : IUserCommunication
             Console.WriteLine("Enter the day for stock (format: YYYY-MM-DD_HH-MM-SS):");
             Console.WriteLine();
         }
+        
+        static void BrandInputPrint()
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the brand prefix:");
+            Console.WriteLine();
+        }
 
         void PrintToConsole(IReadRepository<IEntity> repository)
         {
@@ -120,6 +120,14 @@ public class UserCommunication : IUserCommunication
             foreach (var item in items)
             {
                 Console.WriteLine(item);
+            }
+        }
+        
+        void PrintToConsoleWithLinq(List<Tool> tools)
+        {
+            foreach (var tool in tools)
+            {
+                Console.WriteLine(tool);
             }
         }
 

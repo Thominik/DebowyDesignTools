@@ -6,7 +6,7 @@ namespace DebowyDesignTools.DataProviders.Extensions;
 
 public class FileHelper : IFileHelper
 {
-    public void LoadLastFile()
+    public List<Tool> LoadLastFile()
     {
         var directoryPath =
             @"C:\Users\Dudi\Documents\Projekty\DebowyDesignTools\DebowyDesignTools\bin\Debug\net6.0";
@@ -20,12 +20,11 @@ public class FileHelper : IFileHelper
             Console.WriteLine();
             var fileWithoutExtension = Path.GetFileNameWithoutExtension(latestUserFile.Name);
             var fileRepo = new FileRepository<Tool>(fileWithoutExtension);
-            PrintToConsole(fileRepo);
+            return fileRepo.GetAll().ToList();
         }
-        else
-        {
-            Console.WriteLine("User file not found!");
-        }
+
+        Console.WriteLine("User file not found!");
+        return new List<Tool>();
     }
 
     static FileInfo? GetLatestUserFile(string directoryPath, string pattern)
@@ -37,15 +36,5 @@ public class FileHelper : IFileHelper
             .Where(f => regex.IsMatch(f.Name))
             .OrderByDescending(f => f.LastWriteTime)
             .FirstOrDefault();
-    }
-    
-    void PrintToConsole(IReadRepository<IEntity> repository)
-    {
-        var items = repository.GetAll();
-
-        foreach (var item in items)
-        {
-            Console.WriteLine(item);
-        }
     }
 }

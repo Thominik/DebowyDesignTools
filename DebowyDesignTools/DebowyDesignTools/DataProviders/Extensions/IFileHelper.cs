@@ -1,6 +1,8 @@
-﻿namespace DebowyDesignTools.DataProviders.Extensions;
+﻿using DebowyDesignTools.Entities;
+
+namespace DebowyDesignTools.DataProviders.Extensions;
 
 public interface IFileHelper
 {
-    void LoadLastFile();
+    List<Tool> LoadLastFile();
 }
